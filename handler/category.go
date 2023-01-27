@@ -19,7 +19,7 @@ func NewCategoryHandler(service category.Service) *categoryHandler {
 func (h *categoryHandler) GetCategorys(c *gin.Context) {
 	queryName := c.Query("name")
 
-	category, err := h.service.GetCategories(queryName)
+	newCategory, err := h.service.GetCategories(queryName)
 	if err != nil {
 		response := helper.APIResponse("Failed to fetch data category", http.StatusBadRequest, "error", nil)
 		// kirim response
@@ -27,7 +27,7 @@ func (h *categoryHandler) GetCategorys(c *gin.Context) {
 		return
 	}
 
-	response := helper.APIResponse("List of Category", http.StatusOK, "success", category)
+	response := helper.APIResponse("List of Category", http.StatusOK, "success", category.FormatCategories(newCategory))
 	c.JSON(http.StatusOK, response)
 }
 
@@ -43,14 +43,14 @@ func (h *categoryHandler) GetDetailCategory(c *gin.Context) {
 		return
 	}
 
-	category, err := h.service.GetDetailCategory(inputID)
+	newCategory, err := h.service.GetDetailCategory(inputID)
 	if err != nil {
 		response := helper.APIResponse("Failed fetch data category", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	response := helper.APIResponse("Detail category", http.StatusOK, "success", category)
+	response := helper.APIResponse("Detail category", http.StatusOK, "success", category.FormatCategory(newCategory))
 	c.JSON(http.StatusOK, response)
 }
 
@@ -66,7 +66,7 @@ func (h *categoryHandler) CreateCategory(c *gin.Context) {
 		return
 	}
 
-	category, err := h.service.CreateCategory(input)
+	newCategory, err := h.service.CreateCategory(input)
 	if err != nil {
 		response := helper.APIResponse("Failed create category", http.StatusBadRequest, "error", nil)
 		// kirim response json nya
@@ -74,7 +74,7 @@ func (h *categoryHandler) CreateCategory(c *gin.Context) {
 		return
 	}
 
-	response := helper.APIResponse("Category created", http.StatusOK, "success", category)
+	response := helper.APIResponse("Category created", http.StatusOK, "success", category.FormatCategory(newCategory))
 	c.JSON(http.StatusOK, response)
 }
 
@@ -100,7 +100,7 @@ func (h *categoryHandler) UpdateCategory(c *gin.Context) {
 	}
 
 	// update data
-	category, err := h.service.UpdateCategory(inputID, inputData)
+	newCategory, err := h.service.UpdateCategory(inputID, inputData)
 
 	if err != nil {
 		response := helper.APIResponse("Failed get data category", http.StatusBadRequest, "error", nil)
@@ -108,7 +108,7 @@ func (h *categoryHandler) UpdateCategory(c *gin.Context) {
 		return
 	}
 
-	response := helper.APIResponse("Category update", http.StatusOK, "success", category)
+	response := helper.APIResponse("Category update", http.StatusOK, "success", category.FormatCategory(newCategory))
 	c.JSON(http.StatusOK, response)
 	return
 }
@@ -123,13 +123,13 @@ func (h *categoryHandler) DeleteCategory(c *gin.Context) {
 		return
 	}
 
-	category, err := h.service.DeleteCategory(inputID)
+	newCategory, err := h.service.DeleteCategory(inputID)
 	if err != nil {
 		response := helper.APIResponse("Data not found", http.StatusNotFound, "error", nil)
 		c.JSON(http.StatusNotFound, response)
 		return
 	}
 
-	response := helper.APIResponse("Category has been deleted", http.StatusOK, "error", category)
+	response := helper.APIResponse("Category has been deleted", http.StatusOK, "error", category.FormatCategory(newCategory))
 	c.JSON(http.StatusOK, response)
 }
