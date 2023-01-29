@@ -13,7 +13,6 @@ type service struct {
 }
 
 // CreateCategory implements Service
-
 func NewService(repository Repository) *service {
 	return &service{repository}
 }
