@@ -40,6 +40,9 @@ func main() {
 	// Courir
 	apiV1.GET("/courirs", courirHandler.GetCourirs)
 	apiV1.GET("/courir/:id", courirHandler.GetDetailCourir)
+	apiV1.POST("/courir", courirHandler.CreateCourir)
+	apiV1.PUT("/courir/:id", courirHandler.UpdateCourir)
+	apiV1.DELETE("/courir/:id", courirHandler.DeleteCourir)
 
 	router.Run()
 }
