@@ -3,6 +3,7 @@ package main
 import (
 	"LuxSpace/app/v1/category"
 	"LuxSpace/app/v1/courir"
+	"LuxSpace/app/v1/user"
 	"LuxSpace/configs"
 	"LuxSpace/handler"
 	"fmt"
@@ -17,15 +18,26 @@ func main() {
 		return
 	}
 
+	// V1 - Category
 	categoryRepository := category.NewRepository(db)
 	categoryService := category.NewService(categoryRepository)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
-
+	// V1 - Courir
 	courirRepository := courir.NewRepository(db)
 	courirService := courir.NewService(courirRepository)
 	courirHandler := handler.NewCourirHandler((courirService))
+	// V1 - User
+	userRepository := user.NewRepository(db)
+	userService := user.NewService(userRepository)
+	userHandler := handler.NewUserHandler(userService)
 
-	// fmt.Println(courirService.GetCourirs())
+	// user := user.CreateUserInput{
+	// 	Username: "acep",
+	// 	Email:    "acep@gmail.com",
+	// 	Password: "12345",
+	// }
+	// newUser, _ := userService.Register(user)
+	// fmt.Println(newUser)
 
 	router := gin.Default()
 
@@ -43,6 +55,8 @@ func main() {
 	apiV1.POST("/courir", courirHandler.CreateCourir)
 	apiV1.PUT("/courir/:id", courirHandler.UpdateCourir)
 	apiV1.DELETE("/courir/:id", courirHandler.DeleteCourir)
+	// User
+	apiV1.POST("/register", userHandler.RegisterUser)
 
 	router.Run()
 }
