@@ -2,6 +2,7 @@ package handler
 
 import (
 	"LuxSpace/app/v1/user"
+	"LuxSpace/auth"
 	"LuxSpace/helper"
 	"net/http"
 
@@ -9,11 +10,12 @@ import (
 )
 
 type userHandler struct {
-	service user.Service
+	userService user.Service
+	authService auth.Service
 }
 
-func NewUserHandler(service user.Service) *userHandler {
-	return &userHandler{service}
+func NewUserHandler(userService user.Service, authService auth.Service) *userHandler {
+	return &userHandler{userService, authService}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) {
@@ -30,7 +32,7 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 	validEmail.Email = inputData.Email
 
 	// lakukan validasi jika email sudah terdaftar
-	isEmailRegister, err := h.service.IsEmailAvailable(validEmail)
+	isEmailRegister, err := h.userService.IsEmailAvailable(validEmail)
 	if err != nil {
 		response := helper.APIResponse("Failed fetch data user", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
@@ -44,14 +46,47 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	// simpan ke databse jika sudha benar
-	newUser, err := h.service.RegisterUser(inputData)
+	// simpan ke database jika sudha benar
+	newUser, err := h.userService.RegisterUser(inputData)
 	if err != nil {
 		response := helper.APIResponse("Failed fetch data user", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	response := helper.APIResponse("Registration success", http.StatusOK, "success", user.FormatterUserLogin(newUser))
+	response := helper.APIResponse("Registration success", http.StatusOK, "success", user.FormatterUserRegister(newUser))
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *userHandler) LoginUser(c *gin.Context) {
+	var inputData user.LoginInput
+	err := c.ShouldBindJSON(&inputData)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data user", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// cek user login
+	loginUser, err := h.userService.Login(inputData)
+	if err != nil {
+		// cek jika ada error
+		errorMessage := gin.H{"errors": err.Error()}
+		response := helper.APIResponse("Login failed!", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// generate token
+	token, err := h.authService.GenerateToken(loginUser)
+	if err != nil {
+		// cek jika ada error
+		errorMessage := gin.H{"errors": err.Error()}
+		response := helper.APIResponse("Login failed!", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Get data user", http.StatusOK, "success", user.FormatterUserLogin(loginUser, token))
 	c.JSON(http.StatusOK, response)
 }

@@ -4,6 +4,7 @@ import (
 	"LuxSpace/app/v1/category"
 	"LuxSpace/app/v1/courir"
 	"LuxSpace/app/v1/user"
+	"LuxSpace/auth"
 	"LuxSpace/configs"
 	"LuxSpace/handler"
 	"fmt"
@@ -18,6 +19,9 @@ func main() {
 		return
 	}
 
+	// Auth
+	authService := auth.NewService()
+
 	// V1 - Category
 	categoryRepository := category.NewRepository(db)
 	categoryService := category.NewService(categoryRepository)
@@ -29,15 +33,7 @@ func main() {
 	// V1 - User
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
-	userHandler := handler.NewUserHandler(userService)
-
-	// user := user.CreateUserInput{
-	// 	Username: "acep",
-	// 	Email:    "acep@gmail.com",
-	// 	Password: "12345",
-	// }
-	// newUser, _ := userService.Register(user)
-	// fmt.Println(newUser)
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
 
@@ -57,6 +53,7 @@ func main() {
 	apiV1.DELETE("/courir/:id", courirHandler.DeleteCourir)
 	// User
 	apiV1.POST("/register", userHandler.RegisterUser)
+	apiV1.POST("/login", userHandler.LoginUser)
 
 	router.Run()
 }
