@@ -2,12 +2,14 @@ package auth
 
 import (
 	"LuxSpace/app/v1/user"
+	"errors"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
 type Service interface {
 	GenerateToken(inputData user.User) (string, error)
+	ValidateToken(encodeToken string) (*jwt.Token, error)
 }
 
 type jwtService struct{}
@@ -39,4 +41,23 @@ func (s *jwtService) GenerateToken(inputData user.User) (string, error) {
 	}
 
 	return signedToken, nil
+}
+
+func (s *jwtService) ValidateToken(encodeToken string) (*jwt.Token, error) {
+	// parsing token
+	token, err := jwt.Parse(encodeToken, func(token *jwt.Token) (interface{}, error) {
+		// cek algoritma yang digunakan
+		_, isOK := token.Method.(*jwt.SigningMethodHMAC)
+		if !isOK {
+			return isOK, errors.New("Invalid token")
+		}
+
+		return []byte(SECRET_KEY), nil
+	})
+
+	if err != nil {
+		return token, err
+	}
+
+	return token, nil
 }

@@ -7,6 +7,7 @@ import (
 	"LuxSpace/auth"
 	"LuxSpace/configs"
 	"LuxSpace/handler"
+	"LuxSpace/middleware"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -35,10 +36,14 @@ func main() {
 	userService := user.NewService(userRepository)
 	userHandler := handler.NewUserHandler(userService, authService)
 
+	authMiddleware := middleware.NewAuthMiddleware(authService, userService)
+
 	router := gin.Default()
 
 	apiV1 := router.Group("/api/v1")
 
+	// added auth middleware
+	apiV1.Use(authMiddleware.AuthMiddleware())
 	// Category
 	apiV1.GET("/category", categoryHandler.GetCategorys)
 	apiV1.GET("/category/:id", categoryHandler.GetDetailCategory)

@@ -33,3 +33,19 @@ func FormatterUserLogin(user User, token string) FormatUserLogin {
 
 	return formatter
 }
+
+type FormatUserHeader struct {
+	ID       int
+	Email    string
+	Role     string
+	Username string
+}
+
+func FormatterUserHeader(input FormatUserHeader) FormatUserHeader {
+	formatter := FormatUserHeader{}
+	formatter.ID = input.ID
+	formatter.Email = input.Email
+	formatter.Username = input.Username
+	formatter.Role = input.Role
+	return formatter
+}

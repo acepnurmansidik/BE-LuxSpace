@@ -14,6 +14,7 @@ type Service interface {
 	IsEmailAvailable(inputData CheckEmailInput) (bool, error)
 	Login(inputData LoginInput) (User, error)
 	IsActivateUser(otp ActivateOtpInput, email CheckEmailInput) (User, error)
+	GetDetailUser(ID int) (User, error)
 }
 
 type service struct {
@@ -103,6 +104,15 @@ func (s *service) IsActivateUser(otp ActivateOtpInput, email CheckEmailInput) (U
 	getUser.IsActive = 1
 	// update perubahannya
 	newUser, err := s.repository.Update(getUser)
+	if err != nil {
+		return newUser, err
+	}
+
+	return newUser, nil
+}
+
+func (s *service) GetDetailUser(ID int) (User, error) {
+	newUser, err := s.repository.FindByID(ID)
 	if err != nil {
 		return newUser, err
 	}
