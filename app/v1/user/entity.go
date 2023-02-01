@@ -8,5 +8,6 @@ type User struct {
 	Avatar      string
 	PhoneNumber int
 	Role        string
-	CodeOtp     int
+	CodeOtp     string
+	IsActive    int
 }

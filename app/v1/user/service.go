@@ -1,7 +1,10 @@
 package user
 
 import (
+	"crypto/rand"
 	"errors"
+	"fmt"
+	"math/big"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -10,6 +13,7 @@ type Service interface {
 	RegisterUser(inputData CreateUserInput) (User, error)
 	IsEmailAvailable(inputData CheckEmailInput) (bool, error)
 	Login(inputData LoginInput) (User, error)
+	IsActivateUser(otp ActivateOtpInput, email CheckEmailInput) (User, error)
 }
 
 type service struct {
@@ -28,11 +32,18 @@ func (s *service) RegisterUser(inputData CreateUserInput) (User, error) {
 		return user, err
 	}
 
+	// buat kode otp
+	otp, err := rand.Int(rand.Reader, big.NewInt(999999))
+	if err != nil {
+		return user, err
+	}
+
 	// mapping datanya
 	user.Username = inputData.Username
 	user.Email = inputData.Email
 	user.Password = string(passwordHash)
 	user.Role = "customer"
+	user.CodeOtp = fmt.Sprintf("%v", otp)
 
 	// lalu simpan ke dalam database
 	newUser, err := s.repository.Save(user)
@@ -76,4 +87,25 @@ func (s *service) Login(inputData LoginInput) (User, error) {
 	}
 
 	return user, nil
+}
+
+func (s *service) IsActivateUser(otp ActivateOtpInput, email CheckEmailInput) (User, error) {
+	// cari user berdsarkan email
+	getUser, err := s.repository.FindByEmail(email.Email)
+	if err != nil {
+		return getUser, err
+	}
+	// komparasikan kode otp yang dikirim
+	if otp.Otp != getUser.CodeOtp {
+		return getUser, err
+	}
+	// jika bernar aktifkan akunnya
+	getUser.IsActive = 1
+	// update perubahannya
+	newUser, err := s.repository.Update(getUser)
+	if err != nil {
+		return newUser, err
+	}
+
+	return newUser, nil
 }

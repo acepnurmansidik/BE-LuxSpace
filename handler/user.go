@@ -90,3 +90,32 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 	response := helper.APIResponse("Get data user", http.StatusOK, "success", user.FormatterUserLogin(loginUser, token))
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *userHandler) ActivateUser(c *gin.Context) {
+	// ambil kode otp
+	var codeOtp user.ActivateOtpInput
+	err := c.ShouldBindUri(&codeOtp)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch code", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	// ambil emailnya
+	var inputData user.CheckEmailInput
+	err = c.ShouldBind(&inputData)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch code", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	newUser, err := h.userService.IsActivateUser(codeOtp, inputData)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch code", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Account has been active", http.StatusOK, "success", user.FormatterUserRegister(newUser))
+	c.JSON(http.StatusOK, response)
+}

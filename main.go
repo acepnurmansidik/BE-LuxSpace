@@ -54,6 +54,7 @@ func main() {
 	// User
 	apiV1.POST("/register", userHandler.RegisterUser)
 	apiV1.POST("/login", userHandler.LoginUser)
+	apiV1.POST("/activate/:otp", userHandler.ActivateUser)
 
 	router.Run()
 }
