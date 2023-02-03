@@ -1,6 +1,7 @@
 package main
 
 import (
+	"LuxSpace/app/v1/address"
 	"LuxSpace/app/v1/category"
 	"LuxSpace/app/v1/courir"
 	"LuxSpace/app/v1/user"
@@ -35,6 +36,10 @@ func main() {
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
 	userHandler := handler.NewUserHandler(userService, authService)
+	// V1 - Address
+	addressRepository := address.NewRepository(db)
+	addressService := address.NewService(addressRepository)
+	addressHandler := handler.NewAddressHandler(addressService)
 
 	authMiddleware := middleware.NewAuthMiddleware(authService, userService)
 
@@ -60,6 +65,8 @@ func main() {
 	apiV1.POST("/register", userHandler.RegisterUser)
 	apiV1.POST("/login", userHandler.LoginUser)
 	apiV1.POST("/activate/:otp", userHandler.ActivateUser)
+	// Address
+	apiV1.GET("/address-list", addressHandler.GetAllAddress)
 
 	router.Run()
 }
