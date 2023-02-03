@@ -3,7 +3,7 @@ package address
 type Address struct {
 	ID          int
 	AddressName string
-	IsPrimary   int
+	IsPrimary   string
 	OwnerName   string
 	UserId      int
 }

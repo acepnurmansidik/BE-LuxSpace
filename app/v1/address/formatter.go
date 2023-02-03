@@ -3,7 +3,7 @@ package address
 type FormatAddress struct {
 	ID          int    `json:"id"`
 	AddressName string `json:"address_name"`
-	IsPrimary   int    `json:"is_primary"`
+	IsPrimary   string `json:"is_primary"`
 	OwnerName   string `json:"owner_name"`
 }
 

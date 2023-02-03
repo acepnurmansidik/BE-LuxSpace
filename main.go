@@ -67,6 +67,7 @@ func main() {
 	apiV1.POST("/activate/:otp", userHandler.ActivateUser)
 	// Address
 	apiV1.GET("/address-list", addressHandler.GetAllAddress)
+	apiV1.POST("/address", addressHandler.CreateAddress)
 
 	router.Run()
 }
