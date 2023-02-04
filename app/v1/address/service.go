@@ -28,19 +28,9 @@ func (s *service) GetAllAddress(inputID AddressUserInput) ([]Address, error) {
 func (s *service) CreateAddress(inputData CreateAddressInput) (Address, error) {
 	address := Address{}
 	// update semua is primary nya ke false
-	addressWillUpdate, err := s.repository.FindAll(inputData.UserId)
+	_, err := s.repository.MarkAllUserAddressNonPrimary(inputData.UserId)
 	if err != nil {
 		return address, err
-	}
-
-	// update alamat user ke false
-	for _, everyAddress := range addressWillUpdate {
-		everyAddress.IsPrimary = "false"
-		// update alamat utamnya
-		addressUpdated, err := s.repository.Update(everyAddress)
-		if err != nil {
-			return addressUpdated, err
-		}
 	}
 
 	address.AddressName = inputData.AddressName
@@ -64,18 +54,10 @@ func (s *service) UpdateAddress(inputID AddressDetailInput, inputData CreateAddr
 	}
 	// cek jika alamatnya di jadikan utama
 	if inputData.IsPrimary == "true" {
-		// update semuat alamatnya ke false kecuali yang ini
-		addressUpdate, err := s.repository.FindAll(inputData.UserId)
+		// update semua is primary nya ke false
+		_, err := s.repository.MarkAllUserAddressNonPrimary(inputData.UserId)
 		if err != nil {
 			return address, err
-		}
-
-		for _, everyAddress := range addressUpdate {
-			everyAddress.IsPrimary = "false"
-			hashUpdate, err := s.repository.Update(everyAddress)
-			if err != nil {
-				return hashUpdate, err
-			}
 		}
 	}
 

@@ -8,6 +8,7 @@ type Repository interface {
 	Update(address Address) (Address, error)
 	FindByID(addressID int) (Address, error)
 	Destroy(address Address) (Address, error)
+	MarkAllUserAddressNonPrimary(userID int) (bool, error)
 }
 
 type repository struct {
@@ -63,4 +64,13 @@ func (r *repository) Destroy(address Address) (Address, error) {
 	}
 
 	return address, nil
+}
+
+func (r *repository) MarkAllUserAddressNonPrimary(userID int) (bool, error) {
+	err := r.db.Model(&Address{}).Where("user_id = ?", userID).Update("is_primary", "false").Error
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
