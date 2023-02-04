@@ -3,6 +3,7 @@ package address
 type Service interface {
 	GetAllAddress(inputID AddressUserInput) ([]Address, error)
 	CreateAddress(inputData CreateAddressInput) (Address, error)
+	UpdateAddress(inputID AddressDetailInput, inputData CreateAddressInput) (Address, error)
 }
 
 type service struct {
@@ -51,4 +52,41 @@ func (s *service) CreateAddress(inputData CreateAddressInput) (Address, error) {
 	}
 
 	return newAddress, nil
+}
+
+func (s *service) UpdateAddress(inputID AddressDetailInput, inputData CreateAddressInput) (Address, error) {
+	// cari address user berdasarkan id nya
+	address, err := s.repository.FindByID(inputID.ID)
+	if err != nil {
+		return address, err
+	}
+	// cek jika alamatnya di jadikan utama
+	if inputData.IsPrimary == "true" {
+		// update semuat alamatnya ke false kecuali yang ini
+		addressUpdate, err := s.repository.FindAll(inputData.UserId)
+		if err != nil {
+			return address, err
+		}
+
+		for _, everyAddress := range addressUpdate {
+			everyAddress.IsPrimary = "false"
+			hashUpdate, err := s.repository.Update(everyAddress)
+			if err != nil {
+				return hashUpdate, err
+			}
+		}
+	}
+
+	// mapping data yang akan di updatente nya
+	address.AddressName = inputData.AddressName
+	address.OwnerName = inputData.OwnerName
+	address.IsPrimary = inputData.IsPrimary
+
+	// lakukan update
+	addressUpdated, err := s.repository.Update(address)
+	if err != nil {
+		return addressUpdated, err
+	}
+
+	return addressUpdated, err
 }

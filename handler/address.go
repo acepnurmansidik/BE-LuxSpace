@@ -66,3 +66,40 @@ func (h *addressHandler) CreateAddress(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 	return
 }
+
+func (h *addressHandler) UpdateAddress(c *gin.Context) {
+	// tagkap id table addresnya
+	var inputID address.AddressDetailInput
+	err := c.ShouldBindUri(&inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data address", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// tangkap data yang akan di updatenya dari body
+	var inputData address.CreateAddressInput
+	err = c.ShouldBind(&inputData)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data address", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// ambil user id nya
+	value, _ := c.Get("currentUser")
+	userID := value.(user.FormatUserHeader)
+	// mapping data user id ke inputan
+	inputData.UserId = userID.ID
+
+	// update data address
+	newAddress, err := h.service.UpdateAddress(inputID, inputData)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data address", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Address has been updated", http.StatusOK, "success", address.FormatterAddress(newAddress))
+	c.JSON(http.StatusOK, response)
+}

@@ -68,6 +68,7 @@ func main() {
 	// Address
 	apiV1.GET("/address-list", addressHandler.GetAllAddress)
 	apiV1.POST("/address", addressHandler.CreateAddress)
+	apiV1.PUT("/address/:id", addressHandler.UpdateAddress)
 
 	router.Run()
 }

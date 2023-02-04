@@ -10,3 +10,7 @@ type CreateAddressInput struct {
 	OwnerName   string `json:"owner_name" binding:"required"`
 	UserId      int    `json:"user_id"`
 }
+
+type AddressDetailInput struct {
+	ID int `uri:"id" binding:"required"`
+}
