@@ -7,6 +7,7 @@ type Repository interface {
 	Save(address Address) (Address, error)
 	Update(address Address) (Address, error)
 	FindByID(addressID int) (Address, error)
+	Destroy(address Address) (Address, error)
 }
 
 type repository struct {
@@ -48,6 +49,15 @@ func (r *repository) Update(address Address) (Address, error) {
 func (r *repository) FindByID(addressID int) (Address, error) {
 	var address Address
 	err := r.db.Where("ID = ?", addressID).Find(&address).Error
+	if err != nil {
+		return address, err
+	}
+
+	return address, nil
+}
+
+func (r *repository) Destroy(address Address) (Address, error) {
+	err := r.db.Delete(&address).Error
 	if err != nil {
 		return address, err
 	}

@@ -103,3 +103,45 @@ func (h *addressHandler) UpdateAddress(c *gin.Context) {
 	response := helper.APIResponse("Address has been updated", http.StatusOK, "success", address.FormatterAddress(newAddress))
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *addressHandler) DeleteAddress(c *gin.Context) {
+	var inputID address.AddressDetailInput
+	err := c.ShouldBindUri(&inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data address", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// hapus data address user yang login
+	newAddress, err := h.service.DeleteAddress(inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data address", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Address has been deleted", http.StatusOK, "success", address.FormatterAddress(newAddress))
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *addressHandler) GetDetailAddress(c *gin.Context) {
+	var inputID address.AddressDetailInput
+	err := c.ShouldBindUri(&inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data address", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// hapus data address user yang login
+	newAddress, err := h.service.GetDetailAddress(inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data address", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Address has been deleted", http.StatusOK, "success", address.FormatterAddress(newAddress))
+	c.JSON(http.StatusOK, response)
+}

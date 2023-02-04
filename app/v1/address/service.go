@@ -2,8 +2,10 @@ package address
 
 type Service interface {
 	GetAllAddress(inputID AddressUserInput) ([]Address, error)
+	GetDetailAddress(inputID AddressDetailInput) (Address, error)
 	CreateAddress(inputData CreateAddressInput) (Address, error)
 	UpdateAddress(inputID AddressDetailInput, inputData CreateAddressInput) (Address, error)
+	DeleteAddress(inputID AddressDetailInput) (Address, error)
 }
 
 type service struct {
@@ -89,4 +91,29 @@ func (s *service) UpdateAddress(inputID AddressDetailInput, inputData CreateAddr
 	}
 
 	return addressUpdated, err
+}
+
+func (s *service) DeleteAddress(inputID AddressDetailInput) (Address, error) {
+	// cari id yang akan di update
+	address, err := s.repository.FindByID(inputID.ID)
+	if err != nil {
+		return address, err
+	}
+
+	// delete datanya
+	_, err = s.repository.Destroy(address)
+	if err != nil {
+		return address, err
+	}
+
+	return address, nil
+}
+
+func (s *service) GetDetailAddress(inputID AddressDetailInput) (Address, error) {
+	address, err := s.repository.FindByID(inputID.ID)
+	if err != nil {
+		return address, err
+	}
+
+	return address, nil
 }
