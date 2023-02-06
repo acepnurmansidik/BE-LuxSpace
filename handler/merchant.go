@@ -36,8 +36,12 @@ func (h *merchantHandler) CreateUserMerchant(c *gin.Context) {
 	// lalu simpan ke database
 	newMerchant, err := h.service.CreateMerchant(inputData)
 	if err != nil {
-		data := gin.H{"is_upload": false}
-		response := helper.APIResponse("Failed fetch data merchant", http.StatusBadRequest, "error", data)
+		if err.Error() != "" {
+			response := helper.APIResponse(err.Error(), http.StatusBadRequest, "error", nil)
+			c.JSON(http.StatusBadRequest, response)
+			return
+		}
+		response := helper.APIResponse("Failed fetch data merchant", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
