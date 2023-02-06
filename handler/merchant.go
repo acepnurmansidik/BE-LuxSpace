@@ -36,26 +36,6 @@ func (h *merchantHandler) CreateUserMerchant(c *gin.Context) {
 	// mapping id user yang login ke merchant
 	inputData.UserId = userLogin.ID
 
-	// ambil file imagenya
-	file, err := c.FormFile("avatar")
-	if err != nil {
-		response := helper.APIResponse("Failed fetch file image", http.StatusBadRequest, "error", nil)
-		c.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	imageValid, err := helper.ImagesValidation(file.Filename)
-	if err != nil || !imageValid {
-		response := helper.APIResponse("Please insert image extention", http.StatusForbidden, "error", nil)
-		c.JSON(http.StatusForbidden, response)
-		return
-	}
-
-	// buat angka acak untuk me-rename name file
-	randomNumb, _ := rand.Int(rand.Reader, big.NewInt(99999999999))
-	// sambung nama file dengan angka acak tersebut, lalu set path lokasinya
-	path := fmt.Sprintf("images/merchants/%v-%d-%s", userLogin.ID, randomNumb, file.Filename)
-
 	// lalu simpan ke database
 	newMerchant, err := h.service.CreateMerchant(inputData)
 	if err != nil {
@@ -69,6 +49,34 @@ func (h *merchantHandler) CreateUserMerchant(c *gin.Context) {
 		return
 	}
 
+	response := helper.APIResponse("Merhact created", http.StatusOK, "success", merchant.FormatterMerchant(newMerchant))
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *merchantHandler) UploadImageMerchant(c *gin.Context) {
+	// ambil file imagenya
+	file, err := c.FormFile("image_url")
+	if err != nil {
+		response := helper.APIResponse("Failed fetch file image", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	imageValid, err := helper.ImagesValidation(file.Filename)
+	if err != nil || !imageValid {
+		response := helper.APIResponse("Please insert image extention(png, jpeg, jpg)", http.StatusForbidden, "error", nil)
+		c.JSON(http.StatusForbidden, response)
+		return
+	}
+
+	// ambil data user yang ingin membuka merchant
+	userLogin := c.MustGet("currentUser").(user.FormatUserHeader)
+
+	// buat angka acak untuk me-rename name file
+	randomNumb, _ := rand.Int(rand.Reader, big.NewInt(99999999999))
+	// sambung nama file dengan angka acak tersebut, lalu set path lokasinya
+	path := fmt.Sprintf("images/merchants/%v-%d-%s", userLogin.ID, randomNumb, file.Filename)
+
 	// upload fie image
 	err = c.SaveUploadedFile(file, path)
 	if err != nil {
@@ -78,16 +86,13 @@ func (h *merchantHandler) CreateUserMerchant(c *gin.Context) {
 		return
 	}
 
-	// set path lokasi image merchant
-	newMerchant.Avatar = path
-	// update path lokasi image merchant ke database
-	updateMerchant, err := h.service.UpdateMerchant(newMerchant)
+	newMerchant, err := h.service.UpdateMerchant(path, userLogin.ID)
 	if err != nil {
-		response := helper.APIResponse("Failed update data merchant", http.StatusBadRequest, "error", nil)
+		response := helper.APIResponse("Failed fetch data merchant", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	response := helper.APIResponse("Merhact created", http.StatusOK, "success", merchant.FormatterMerchant(updateMerchant))
+	response := helper.APIResponse("Merhact created", http.StatusOK, "success", merchant.FormatterUploadImageMerchant(newMerchant))
 	c.JSON(http.StatusOK, response)
 }

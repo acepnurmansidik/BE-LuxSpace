@@ -2,11 +2,12 @@ package merchant
 
 import (
 	"errors"
+	"strconv"
 )
 
 type Service interface {
 	CreateMerchant(inputData CreateMerchantInput) (Merchant, error)
-	UpdateMerchant(inputData Merchant) (Merchant, error)
+	UpdateMerchant(fileLocation string, userID int) (Merchant, error)
 }
 
 type service struct {
@@ -34,6 +35,19 @@ func (s *service) CreateMerchant(inputData CreateMerchantInput) (Merchant, error
 		return nameIsExist, errors.New("name merchant has been register")
 	}
 
+	// cek apakah user tersebut sadah punya merchant sebelumnya
+	cekMerchant, err := s.repository.FindByUserID(inputData.UserId)
+	if err != nil {
+		return cekMerchant, err
+	}
+
+	// conversi string ke boolean
+	isExits, _ := strconv.ParseBool(cekMerchant.MerchantName)
+	// cek jika user sebelumnya sudah punya merchant
+	if isExits {
+		return cekMerchant, errors.New("you has merchant")
+	}
+
 	// create data nya
 	newMerchant, err := s.repository.Save(merchant)
 	if err != nil {
@@ -43,11 +57,20 @@ func (s *service) CreateMerchant(inputData CreateMerchantInput) (Merchant, error
 	return newMerchant, nil
 }
 
-func (s *service) UpdateMerchant(inputData Merchant) (Merchant, error) {
-	merchant, err := s.repository.Update(inputData)
+func (s *service) UpdateMerchant(fileLocation string, userID int) (Merchant, error) {
+	merchant, err := s.repository.FindByUserID(userID)
 	if err != nil {
 		return merchant, err
 	}
 
-	return merchant, nil
+	// mapping data file location
+	merchant.Avatar = fileLocation
+
+	// update file location ke database
+	newMerchant, err := s.repository.Update(merchant)
+	if err != nil {
+		return newMerchant, err
+	}
+
+	return newMerchant, nil
 }

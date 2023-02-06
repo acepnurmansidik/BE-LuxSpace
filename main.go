@@ -78,6 +78,7 @@ func main() {
 	apiV1.DELETE("/address/:id", addressHandler.DeleteAddress)
 	// Merchant
 	apiV1.POST("/merchant", merchantHandler.CreateUserMerchant)
+	apiV1.POST("/image-merchant", merchantHandler.UploadImageMerchant)
 
 	router.Run()
 }
