@@ -4,6 +4,9 @@ import (
 	"LuxSpace/app/v1/merchant"
 	"LuxSpace/app/v1/user"
 	"LuxSpace/helper"
+	"crypto/rand"
+	"fmt"
+	"math/big"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,6 +36,26 @@ func (h *merchantHandler) CreateUserMerchant(c *gin.Context) {
 	// mapping id user yang login ke merchant
 	inputData.UserId = userLogin.ID
 
+	// ambil file imagenya
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		response := helper.APIResponse("Failed fetch file image", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	imageValid, err := helper.ImagesValidation(file.Filename)
+	if err != nil || !imageValid {
+		response := helper.APIResponse("Please insert image extention", http.StatusForbidden, "error", nil)
+		c.JSON(http.StatusForbidden, response)
+		return
+	}
+
+	// buat angka acak untuk me-rename name file
+	randomNumb, _ := rand.Int(rand.Reader, big.NewInt(99999999999))
+	// sambung nama file dengan angka acak tersebut, lalu set path lokasinya
+	path := fmt.Sprintf("images/merchants/%v-%d-%s", userLogin.ID, randomNumb, file.Filename)
+
 	// lalu simpan ke database
 	newMerchant, err := h.service.CreateMerchant(inputData)
 	if err != nil {
@@ -46,6 +69,25 @@ func (h *merchantHandler) CreateUserMerchant(c *gin.Context) {
 		return
 	}
 
-	response := helper.APIResponse("Merhact created", http.StatusOK, "success", merchant.FormatterMerchant(newMerchant))
+	// upload fie image
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+		errorMessage := gin.H{"is_upload": false}
+		response := helper.APIResponse("Failed upload file image", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// set path lokasi image merchant
+	newMerchant.Avatar = path
+	// update path lokasi image merchant ke database
+	updateMerchant, err := h.service.UpdateMerchant(newMerchant)
+	if err != nil {
+		response := helper.APIResponse("Failed update data merchant", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Merhact created", http.StatusOK, "success", merchant.FormatterMerchant(updateMerchant))
 	c.JSON(http.StatusOK, response)
 }

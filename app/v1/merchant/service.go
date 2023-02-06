@@ -6,6 +6,7 @@ import (
 
 type Service interface {
 	CreateMerchant(inputData CreateMerchantInput) (Merchant, error)
+	UpdateMerchant(inputData Merchant) (Merchant, error)
 }
 
 type service struct {
@@ -40,4 +41,13 @@ func (s *service) CreateMerchant(inputData CreateMerchantInput) (Merchant, error
 	}
 
 	return newMerchant, nil
+}
+
+func (s *service) UpdateMerchant(inputData Merchant) (Merchant, error) {
+	merchant, err := s.repository.Update(inputData)
+	if err != nil {
+		return merchant, err
+	}
+
+	return merchant, nil
 }

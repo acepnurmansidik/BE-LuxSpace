@@ -10,6 +10,6 @@ type CreateMerchantInput struct {
 	UserId          int    `form:"user_id"`
 }
 
-type UploadImageMerchantInput struct {
+type CreateImageMerchant struct {
 	Avatar string `form:"avatar"`
 }
