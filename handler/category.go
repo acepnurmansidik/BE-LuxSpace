@@ -110,7 +110,6 @@ func (h *categoryHandler) UpdateCategory(c *gin.Context) {
 
 	response := helper.APIResponse("Category update", http.StatusOK, "success", category.FormatCategory(newCategory))
 	c.JSON(http.StatusOK, response)
-	return
 }
 
 func (h *categoryHandler) DeleteCategory(c *gin.Context) {

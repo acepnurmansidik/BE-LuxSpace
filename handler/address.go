@@ -64,7 +64,6 @@ func (h *addressHandler) CreateAddress(c *gin.Context) {
 
 	response := helper.APIResponse("Address created", http.StatusOK, "success", address.FormatterAddress(newAddress))
 	c.JSON(http.StatusOK, response)
-	return
 }
 
 func (h *addressHandler) UpdateAddress(c *gin.Context) {

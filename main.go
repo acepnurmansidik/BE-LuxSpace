@@ -4,6 +4,7 @@ import (
 	"LuxSpace/app/v1/address"
 	"LuxSpace/app/v1/category"
 	"LuxSpace/app/v1/courir"
+	"LuxSpace/app/v1/merchant"
 	"LuxSpace/app/v1/user"
 	"LuxSpace/auth"
 	"LuxSpace/configs"
@@ -40,6 +41,10 @@ func main() {
 	addressRepository := address.NewRepository(db)
 	addressService := address.NewService(addressRepository)
 	addressHandler := handler.NewAddressHandler(addressService)
+	// V1 - Merchant
+	merchantRepository := merchant.NewRepository(db)
+	merchantService := merchant.NewService(merchantRepository)
+	merchantHandler := handler.NewMerchantHandler(merchantService)
 
 	authMiddleware := middleware.NewAuthMiddleware(authService, userService)
 
@@ -71,6 +76,8 @@ func main() {
 	apiV1.POST("/address", addressHandler.CreateAddress)
 	apiV1.PUT("/address/:id", addressHandler.UpdateAddress)
 	apiV1.DELETE("/address/:id", addressHandler.DeleteAddress)
+	// Merchant
+	apiV1.POST("/merchant", merchantHandler.CreateUserMerchant)
 
 	router.Run()
 }
