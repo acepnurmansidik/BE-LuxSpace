@@ -5,6 +5,7 @@ import (
 	"LuxSpace/app/v1/category"
 	"LuxSpace/app/v1/courir"
 	"LuxSpace/app/v1/merchant"
+	"LuxSpace/app/v1/product"
 	"LuxSpace/app/v1/user"
 	"LuxSpace/auth"
 	"LuxSpace/configs"
@@ -45,6 +46,10 @@ func main() {
 	merchantRepository := merchant.NewRepository(db)
 	merchantService := merchant.NewService(merchantRepository)
 	merchantHandler := handler.NewMerchantHandler(merchantService)
+	// V1 - Product
+	productRepository := product.NewRepository(db)
+	productService := product.NewService(productRepository)
+	productHandler := handler.NewProductHandler(productService)
 
 	authMiddleware := middleware.NewAuthMiddleware(authService, userService)
 
@@ -79,6 +84,8 @@ func main() {
 	// Merchant
 	apiV1.POST("/merchant", merchantHandler.CreateUserMerchant)
 	apiV1.POST("/image-merchant", merchantHandler.UploadImageMerchant)
+	// Product
+	apiV1.POST("/product", productHandler.CreateProductMerchant)
 
 	router.Run()
 }
