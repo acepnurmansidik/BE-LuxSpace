@@ -48,8 +48,8 @@ func main() {
 	merchantHandler := handler.NewMerchantHandler(merchantService)
 	// V1 - Product
 	productRepository := product.NewRepository(db)
-	productService := product.NewService(productRepository)
-	productHandler := handler.NewProductHandler(productService)
+	productService := product.NewService(productRepository, merchantRepository)
+	productHandler := handler.NewProductHandler(productService, merchantService)
 
 	authMiddleware := middleware.NewAuthMiddleware(authService, userService)
 
@@ -86,6 +86,7 @@ func main() {
 	apiV1.POST("/image-merchant", merchantHandler.UploadImageMerchant)
 	// Product
 	apiV1.POST("/product", productHandler.CreateProductMerchant)
+	apiV1.GET("/products", productHandler.GetAllMerchantProduct)
 
 	router.Run()
 }

@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"LuxSpace/app/v1/merchant"
 	"LuxSpace/app/v1/product"
+	"LuxSpace/app/v1/user"
 	"LuxSpace/helper"
 	"crypto/rand"
 	"fmt"
@@ -12,11 +14,12 @@ import (
 )
 
 type productHandler struct {
-	service product.Service
+	service  product.Service
+	merchant merchant.Service
 }
 
-func NewProductHandler(service product.Service) *productHandler {
-	return &productHandler{service}
+func NewProductHandler(service product.Service, merchant merchant.Service) *productHandler {
+	return &productHandler{service, merchant}
 }
 
 func (h *productHandler) CreateProductMerchant(c *gin.Context) {
@@ -27,6 +30,19 @@ func (h *productHandler) CreateProductMerchant(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
+	// ambil ID user nya
+	value := c.MustGet("currentUser")
+	userID := value.(user.FormatUserHeader)
+	// ambil id merchant berdasarkan user yang sudja daftar
+	merchantID, err := h.merchant.GetMerchantByUserID(userID.ID)
+	if err != nil {
+		response := helper.APIResponse("Failed to fetch data product", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	inputDataProduct.MerchantID = merchantID.ID
 
 	// simpan ke database
 	newProduct, err := h.service.CreateProduct(inputDataProduct)
@@ -76,6 +92,21 @@ func (h *productHandler) CreateProductMerchant(c *gin.Context) {
 		}
 	}
 
-	response := helper.APIResponse("Product created", http.StatusOK, "success", product.FormatterProduct(newProduct))
+	response := helper.APIResponse("Product created", http.StatusOK, "success", product.FormatterMerchantProducts(newProduct))
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *productHandler) GetAllMerchantProduct(c *gin.Context) {
+	// ambil id usernya di JWT
+	value := c.MustGet("currentUser")
+	userID := value.(user.FormatUserHeader)
+	products, err := h.service.GetAllMerchantProduct(userID.ID)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data products", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Get products", http.StatusOK, "success", product.FormatterMerchantProductsList(products))
 	c.JSON(http.StatusOK, response)
 }

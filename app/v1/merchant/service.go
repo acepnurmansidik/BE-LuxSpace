@@ -8,6 +8,7 @@ import (
 type Service interface {
 	CreateMerchant(inputData CreateMerchantInput) (Merchant, error)
 	UpdateMerchant(fileLocation string, userID int) (Merchant, error)
+	GetMerchantByUserID(userID int) (Merchant, error)
 }
 
 type service struct {
@@ -68,6 +69,15 @@ func (s *service) UpdateMerchant(fileLocation string, userID int) (Merchant, err
 
 	// update file location ke database
 	newMerchant, err := s.repository.Update(merchant)
+	if err != nil {
+		return newMerchant, err
+	}
+
+	return newMerchant, nil
+}
+
+func (s *service) GetMerchantByUserID(userID int) (Merchant, error) {
+	newMerchant, err := s.repository.FindByUserID(userID)
 	if err != nil {
 		return newMerchant, err
 	}

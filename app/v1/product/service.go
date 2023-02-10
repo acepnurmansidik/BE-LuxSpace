@@ -1,16 +1,20 @@
 package product
 
+import "LuxSpace/app/v1/merchant"
+
 type Service interface {
 	CreateProduct(inputDataProduct CreateProductInput) (Product, error)
 	SaveUploadProductImages(inputImage CreateProductImagesInput) (bool, error)
+	GetAllMerchantProduct(userID int) ([]Product, error)
 }
 
 type service struct {
 	repository Repository
+	merchant   merchant.Repository
 }
 
-func NewService(repository Repository) *service {
-	return &service{repository}
+func NewService(repository Repository, merchant merchant.Repository) *service {
+	return &service{repository, merchant}
 }
 
 func (s *service) CreateProduct(inputDataProduct CreateProductInput) (Product, error) {
@@ -46,4 +50,20 @@ func (s *service) SaveUploadProductImages(inputImage CreateProductImagesInput) (
 	}
 
 	return true, nil
+}
+
+func (s *service) GetAllMerchantProduct(userID int) ([]Product, error) {
+	// cari merchant berdasarkan user yang sudah mendafatar
+	merchantID, err := s.merchant.FindByUserID(userID)
+	if err != nil {
+		return []Product{}, err
+	}
+
+	// jika ada cari product nya
+	products, err := s.repository.FindAllByMerchant(merchantID.ID)
+	if err != nil {
+		return []Product{}, err
+	}
+
+	return products, nil
 }

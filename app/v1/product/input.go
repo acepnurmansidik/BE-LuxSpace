@@ -7,7 +7,7 @@ type CreateProductInput struct {
 	Weight      int    `form:"weight" binding:"required"`
 	Price       int    `form:"price" binding:"required"`
 	CategoryID  int    `form:"category_id" binding:"required"`
-	MerchantID  int    `form:"merchant_id" binding:"required"`
+	MerchantID  int
 }
 
 type CreateProductImagesInput struct {
