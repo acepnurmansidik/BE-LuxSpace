@@ -9,6 +9,8 @@ type Repository interface {
 	SaveProduct(product Product) (Product, error)
 	SaveProductImage(productImage ProductImages) (ProductImages, error)
 	FindAllByMerchant(merchantID int) ([]Product, error)
+	Destroy(product Product) (Product, error)
+	FindByID(ID int) (Product, error)
 }
 
 type repository struct {
@@ -45,4 +47,23 @@ func (r *repository) FindAllByMerchant(merchantID int) ([]Product, error) {
 	}
 
 	return products, nil
+}
+
+func (r *repository) Destroy(product Product) (Product, error) {
+	err := r.db.Delete(&product).Error
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
+}
+
+func (r *repository) FindByID(ID int) (Product, error) {
+	var product Product
+	err := r.db.Where("ID = ?", ID).Find(&product).Error
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
 }

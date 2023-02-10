@@ -87,6 +87,7 @@ func main() {
 	// Product
 	apiV1.POST("/product", productHandler.CreateProductMerchant)
 	apiV1.GET("/products", productHandler.GetAllMerchantProduct)
+	apiV1.DELETE("/product/:id", productHandler.DeleteProduct)
 
 	router.Run()
 }

@@ -15,3 +15,7 @@ type CreateProductImagesInput struct {
 	IsPrimary string `form:"is_primary" binding:"required"`
 	ProductId int    `form:"product_id" binding:"required"`
 }
+
+type ProductDetailInput struct {
+	ID int `uri:"id" binding:"required"`
+}
