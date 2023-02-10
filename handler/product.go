@@ -100,7 +100,16 @@ func (h *productHandler) GetAllMerchantProduct(c *gin.Context) {
 	// ambil id usernya di JWT
 	value := c.MustGet("currentUser")
 	userID := value.(user.FormatUserHeader)
-	products, err := h.service.GetAllMerchantProduct(userID.ID)
+
+	// cari merchant id
+	merchantRegister, err := h.merchant.GetMerchantByUserID(userID.ID)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data merchant", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	products, err := h.service.GetAllMerchantProduct(merchantRegister.ID)
 	if err != nil {
 		response := helper.APIResponse("Failed fetch data products", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)

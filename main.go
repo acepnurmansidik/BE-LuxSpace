@@ -48,7 +48,7 @@ func main() {
 	merchantHandler := handler.NewMerchantHandler(merchantService)
 	// V1 - Product
 	productRepository := product.NewRepository(db)
-	productService := product.NewService(productRepository, merchantRepository)
+	productService := product.NewService(productRepository)
 	productHandler := handler.NewProductHandler(productService, merchantService)
 
 	authMiddleware := middleware.NewAuthMiddleware(authService, userService)
