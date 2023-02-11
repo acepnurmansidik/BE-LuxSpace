@@ -22,6 +22,6 @@ type Product struct {
 type ProductImages struct {
 	ID        int
 	Name      string
-	IsPrimary string
+	IsDelete  string
 	ProductId int
 }

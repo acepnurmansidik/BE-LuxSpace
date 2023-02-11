@@ -37,7 +37,7 @@ func (s *service) CreateProduct(inputDataProduct CreateProductInput) (Product, e
 func (s *service) SaveUploadProductImages(inputImage CreateProductImagesInput) (bool, error) {
 	// mapping datanta
 	productImage := ProductImages{}
-	productImage.IsPrimary = inputImage.IsPrimary
+	productImage.IsDelete = inputImage.IsDelete
 	productImage.Name = inputImage.Name
 	productImage.ProductId = inputImage.ProductId
 

@@ -7,14 +7,14 @@ import (
 
 // product image list
 type FormatProductImage struct {
-	Name      string `json:"name" binding:"required"`
-	IsPrimary string `json:"is_primary" binding:"required"`
+	Name     string `json:"name" binding:"required"`
+	IsActive string `json:"is_active" binding:"required"`
 }
 
 func FormatterProductImage(image ProductImages) FormatProductImage {
 	formatter := FormatProductImage{}
 	formatter.Name = image.Name
-	formatter.IsPrimary = image.IsPrimary
+	formatter.IsActive = image.IsDelete
 
 	return formatter
 }

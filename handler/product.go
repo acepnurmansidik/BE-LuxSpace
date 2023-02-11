@@ -70,7 +70,7 @@ func (h *productHandler) CreateProductMerchant(c *gin.Context) {
 
 		// mapping datanya
 		formatProductImages := product.CreateProductImagesInput{}
-		formatProductImages.IsPrimary = "false"
+		formatProductImages.IsDelete = "false"
 		formatProductImages.Name = path
 		formatProductImages.ProductId = newProduct.ID
 

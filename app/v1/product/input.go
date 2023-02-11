@@ -12,7 +12,7 @@ type CreateProductInput struct {
 
 type CreateProductImagesInput struct {
 	Name      string `form:"name" binding:"required"`
-	IsPrimary string `form:"is_primary" binding:"required"`
+	IsDelete  string `form:"is_primary"`
 	ProductId int    `form:"product_id" binding:"required"`
 }
 
