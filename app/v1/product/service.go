@@ -5,6 +5,7 @@ type Service interface {
 	SaveUploadProductImages(inputImage CreateProductImagesInput) (bool, error)
 	GetAllMerchantProduct(merchantID int) ([]Product, error)
 	DeleteProduct(productID ProductDetailInput) (Product, error)
+	UpdateProductMerchant(inputData CreateProductInput, inputID ProductDetailInput) (Product, error)
 }
 
 type service struct {
@@ -68,6 +69,30 @@ func (s *service) DeleteProduct(productID ProductDetailInput) (Product, error) {
 	}
 	// hapus productnya
 	newProduct, err := s.repository.Destroy(getProduct)
+	if err != nil {
+		return newProduct, err
+	}
+
+	return newProduct, nil
+}
+
+func (s *service) UpdateProductMerchant(inputData CreateProductInput, inputID ProductDetailInput) (Product, error) {
+	// cari product yang akan di update
+	product, err := s.repository.FindByID(inputID.ID)
+	if err != nil {
+		return product, err
+	}
+
+	// mapping data yang akan di update
+	product.CategoryId = inputData.CategoryID
+	product.Title = inputData.Title
+	product.Description = inputData.Description
+	product.Stock = inputData.Stock
+	product.Weight = inputData.Weight
+	product.Price = inputData.Price
+
+	// update datanya
+	newProduct, err := s.repository.Update(product)
 	if err != nil {
 		return newProduct, err
 	}

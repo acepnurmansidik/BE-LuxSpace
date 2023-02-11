@@ -140,3 +140,33 @@ func (h *productHandler) DeleteProduct(c *gin.Context) {
 	response := helper.APIResponse("Product deleted", http.StatusOK, "success", product.FormatterMerchantProducts(newProduct))
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *productHandler) UpdateProduct(c *gin.Context) {
+	var inputData product.CreateProductInput
+	err := c.ShouldBind(&inputData)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data products", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// ambil id productnya
+	var inputID product.ProductDetailInput
+	err = c.ShouldBindUri(&inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data uri products", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// update datanya
+	newProduct, err := h.service.UpdateProductMerchant(inputData, inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data products", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Data updated", http.StatusOK, "succcess", product.FormatterMerchantProducts(newProduct))
+	c.JSON(http.StatusOK, response)
+}

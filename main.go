@@ -88,6 +88,7 @@ func main() {
 	apiV1.POST("/product", productHandler.CreateProductMerchant)
 	apiV1.GET("/products", productHandler.GetAllMerchantProduct)
 	apiV1.DELETE("/product/:id", productHandler.DeleteProduct)
+	apiV1.PUT("/product/:id", productHandler.UpdateProduct)
 
 	router.Run()
 }
