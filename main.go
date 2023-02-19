@@ -86,6 +86,7 @@ func main() {
 	apiV1.POST("/image-merchant", merchantHandler.UploadImageMerchant)
 	// Product
 	apiV1.POST("/product", productHandler.CreateProductMerchant)
+	apiV1.GET("/product/:id", productHandler.GetProductDetail)
 	apiV1.GET("/products", productHandler.GetAllMerchantProduct)
 	apiV1.DELETE("/product/:id", productHandler.DeleteProduct)
 	apiV1.PUT("/product/:id", productHandler.UpdateProduct)

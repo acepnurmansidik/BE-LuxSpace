@@ -170,3 +170,22 @@ func (h *productHandler) UpdateProduct(c *gin.Context) {
 	response := helper.APIResponse("Data updated", http.StatusOK, "succcess", product.FormatterMerchantProducts(newProduct))
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *productHandler) GetProductDetail(c *gin.Context) {
+	var inputID product.ProductDetailInput
+	err := c.ShouldBindUri(&inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data uri products", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	productDetail, err := h.service.GetProductDetail(inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed fetch data products", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := helper.APIResponse("Data updated", http.StatusOK, "succcess", product.FormatterMerchantProducts(productDetail))
+	c.JSON(http.StatusOK, response)
+}

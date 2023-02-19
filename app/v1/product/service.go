@@ -2,6 +2,7 @@ package product
 
 type Service interface {
 	CreateProduct(inputDataProduct CreateProductInput) (Product, error)
+	GetProductDetail(inputID ProductDetailInput) (Product, error)
 	SaveUploadProductImages(inputImage CreateProductImagesInput) (bool, error)
 	GetAllMerchantProduct(merchantID int) ([]Product, error)
 	DeleteProduct(productID ProductDetailInput) (Product, error)
@@ -98,4 +99,13 @@ func (s *service) UpdateProductMerchant(inputData CreateProductInput, inputID Pr
 	}
 
 	return newProduct, nil
+}
+
+func (s *service) GetProductDetail(inputID ProductDetailInput) (Product, error) {
+	productDetail, err := s.repository.FindByID(inputID.ID)
+	if err != nil {
+		return productDetail, err
+	}
+
+	return productDetail, nil
 }

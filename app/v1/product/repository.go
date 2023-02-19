@@ -61,7 +61,7 @@ func (r *repository) Destroy(product Product) (Product, error) {
 
 func (r *repository) FindByID(ID int) (Product, error) {
 	var product Product
-	err := r.db.Where("ID = ?", ID).Find(&product).Error
+	err := r.db.Preload("Category").Preload("Merchant").Preload("ProductImages").Where("ID = ?", ID).Find(&product).Error
 	if err != nil {
 		return product, err
 	}
